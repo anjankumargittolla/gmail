@@ -90,27 +90,26 @@ def logout_page(request):
 def mails(request):
     """TO send the mails from user"""
     if request.method == "POST":
-        import pdb
-        pdb.set_trace()
-        form = MailsForm(request.POST)
-        user = Registration.objects.get(user=request.user)
-        # print(request.user.first_name)
-        Mails.objects.create(sender=user,
-                             receiver=request.POST["receiver"],
-                             subject=request.POST['subject'],
-                             body=request.POST['body'])
-        return HttpResponseRedirect("/mail/profile/")
+        if request.POST["send"] != "cancel":
+            # form = MailsForm(request.POST)
+            user = Registration.objects.get(user=request.user)
+            Mails.objects.create(sender=user,
+                                 receiver=request.POST["receiver"],
+                                 subject=request.POST['subject'],
+                                 body=request.POST['body'])
+            return HttpResponseRedirect("/mail/profile/")
+        else:
+            user = Registration.objects.get(user=request.user)
+            Mails.objects.create(sender=user,
+                                 receiver=request.POST["receiver"],
+                                 subject=request.POST['subject'],
+                                 body=request.POST['body'],
+                                 is_draft=True,
+                                 )
+            return HttpResponseRedirect("/mail/profile/")
     else:
         form = MailsForm()
         return render(request, "mail/compose.html", {"mail": form})
-
-
-def inbox(request):
-    """This will displays the inbox emails"""
-    # import pdb
-    # pdb.set_trace()
-    inbox_mails = Mails.objects.filter(receiver=request.user.email)
-    return render(request, 'mail/inbox.html', {"inbox": inbox_mails})
 
 
 def sender_mails(request):
@@ -120,21 +119,20 @@ def sender_mails(request):
     sent_mail = []
     drafts = []
     for i in sent:
-        if i.receiver.endswith("@gmail.com"):
-            sent_mail.append(i)
-        else:
-            drafts.append(i)
+        sent_mail.append(i)
     data = {
         "sent": sent_mail,
-        "draft": drafts
     }
     return data
     # return render(request, 'job/drafts.html', {"drafts" : drafts})
 
 
-# def draft_mails(request):
-#     """This will displays the drafts"""
-#     return render(request, 'mail/drafts.html', {"data": sender_mails(request)})
+def draft_mails(request):
+    """This will displays the drafts"""
+    user = Registration.objects.get(user=request.user)
+    draft = Mails.objects.filter(sender=user, is_draft=True)
+    print(draft, request.user.first_name)
+    return render(request, 'mail/drafts.html', {"draft": draft})
 
 
 def sent_mails(request):
@@ -142,23 +140,31 @@ def sent_mails(request):
     return render(request, 'mail/sent.html', {"data": sender_mails(request)})
 
 
-def cancel_mails(request):
-    """It'll store the draft mails in drafts"""
-    import pdb
-    pdb.set_trace()
-    if request.method == "POST":
-        user = Registration.objects.get(user=request.user)
-        draft = Mails.objects.create(sender=user,
-                                     receiver=request.POST["receiver"],
-                                     subject=request.POST['subject'],
-                                     body=request.POST['body'],
-                                     is_draft=True,
-                                     )
-        print(draft.mails_id)
-        return render(request, 'mail/drafts.html', {"draft": draft})
-    else:
-        return HttpResponse("it is not in post")
+def receive_mails(request):
+    # import pdb
+    # pdb.set_trace()
+    user = request.user
+    spam = Mails.objects.filter(receiver=user.email)
+    spam_mail=[]
+    inbox_mails = []
+    for i in spam:
+        new = User.objects.get(first_name=i.sender)
+        reg = Registration.objects.get(user=new)
+        if reg.is_spam:
+            spam_mail.append(i)
+        else:
+            inbox_mails.append(i)
+        new_data = {
+            "inbox" : inbox_mails,
+            "spam" : spam_mail
+        }
+        return new_data
 
 
-# def divert(request):
+def inbox(request):
+    """This will displays the inbox emails"""
+    return render(request, 'mail/inbox.html', {"data": receive_mails(request)})
 
+
+def spam_mails(request):
+    return render(request, 'mail/spam.html', {"data": receive_mails(request)})

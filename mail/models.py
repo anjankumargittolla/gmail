@@ -10,6 +10,7 @@ class Registration(models.Model):
     user = models.ForeignKey(User, related_name="user_info", on_delete=models.CASCADE)
     phone = models.IntegerField()
     dob = models.DateField(max_length=8)
+    is_spam  = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.user.first_name)
@@ -24,7 +25,6 @@ class Mails(models.Model):
     subject = models.CharField(max_length=100)
     body = models.TextField(max_length=500)
     is_draft = models.BooleanField(default=False)
-    is_spam = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.sender)

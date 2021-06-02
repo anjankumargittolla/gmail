@@ -5,12 +5,12 @@
     <title>Title</title>
 </head>
 <body>
-{% for i in data.draft %}
-<a href="/job/divert/">{{i.receiver}} ==>> {{i.subject}}</a>
-<hr>
+{% for i in draft %}
+sender : {{i.sender}}<br>
+receiver : {{i.receiver}}<br>
+subject : {{i.subject}}<br>
+body : {{i.body}}<br>
 {% endfor %}
-<form>
- <input type="button" value="Go back!" onclick="history.back()">
-</form>
+<a href="/mail/profile/">Back</a>
 </body>
 </html>
