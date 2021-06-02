@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form action="/mail/mails/" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+    {{mail.as_p}}
+  <input type="submit" name="send" value="submit"><br> <input type="submit" name="send" value="cancel">
+</form><br>
+<a href="/mail/profile/">back</a>
+</body>
+</html>

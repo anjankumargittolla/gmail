@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% for i in data.sent %}
+sender : {{i.sender}}<br>
+receiver : {{i.receiver}}<br>
+subject : {{i.subject}}<br>
+body : {{i.body}}<br>
+<hr>
+{% endfor %}
+<form>
+ <input type="button" value="Go back!" onclick="history.back()">
+</form>
+</body>
+</html>
