@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form action="/mail/mails/" method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+    Receiver : <input type="text" name="receiver" value="{{new.receiver}}"><br>
+    Subject : <input type="text" name="subject" value="{{new.subject}}"><br>
+    Body :  <input type="text" name="body" value="{{new.body}}"><br>
+  <input type="submit" name="send" value="submit"><br> <input type="submit" name="send" value="cancel">
+</form><br>
+<a href="/mail/profile/">back</a>
+</body>
+</html>

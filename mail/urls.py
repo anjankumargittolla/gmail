@@ -15,5 +15,7 @@ urlpatterns = [
     path('drafts/', views.draft_mails, name='drafts'),
     path('sent/', views.sent_mails, name="sent"),
     path('spam/', views.spam_mails, name='spam'),
-    # path('cancel/', views.cancel_mails, name="cancel"),
+    path('<int:id>/trash/', views.trash, name='trash'),
+    path("trash_mails/", views.show_trash, name='trash_mails'),
+    path('<int:id>/un_draft/', views.resend, name='resend'),
 ]

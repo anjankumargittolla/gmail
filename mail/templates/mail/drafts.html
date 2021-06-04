@@ -6,10 +6,17 @@
 </head>
 <body>
 {% for i in draft %}
+id = {{i.id}}<br>
 sender : {{i.sender}}<br>
 receiver : {{i.receiver}}<br>
 subject : {{i.subject}}<br>
 body : {{i.body}}<br>
+<form action="/mail/{{i.id}}/un_draft/" method="post">
+ {% csrf_token %}
+ <input type="checkbox" name="resend" >
+ <input type="submit" value="submit">
+</form>
+<hr>
 {% endfor %}
 <a href="/mail/profile/">Back</a>
 </body>

@@ -93,21 +93,22 @@ def mails(request):
         if request.POST["send"] != "cancel":
             # form = MailsForm(request.POST)
             user = Registration.objects.get(user=request.user)
-            Mails.objects.create(sender=user,
-                                 receiver=request.POST["receiver"],
-                                 subject=request.POST['subject'],
-                                 body=request.POST['body'])
+            Mails.objects.get_or_create(sender=user,
+                                        receiver=request.POST["receiver"],
+                                        subject=request.POST['subject'],
+                                        body=request.POST['body'])
             return HttpResponseRedirect("/mail/profile/")
         else:
             user = Registration.objects.get(user=request.user)
-            Mails.objects.create(sender=user,
-                                 receiver=request.POST["receiver"],
-                                 subject=request.POST['subject'],
-                                 body=request.POST['body'],
-                                 is_draft=True,
-                                 )
+            Mails.objects.get_or_create(sender=user,
+                                        receiver=request.POST["receiver"],
+                                        subject=request.POST['subject'],
+                                        body=request.POST['body'],
+                                        is_draft=True,
+                                        )
             return HttpResponseRedirect("/mail/profile/")
     else:
+        print(request.user.first_name)
         form = MailsForm()
         return render(request, "mail/compose.html", {"mail": form})
 
@@ -115,22 +116,20 @@ def mails(request):
 def sender_mails(request):
     """for separating the sent mails and drafts"""
     user = Registration.objects.get(user=request.user)
-    sent = Mails.objects.filter(sender=user)
+    sent = Mails.objects.filter(sender=user, is_trash=False)
     sent_mail = []
-    drafts = []
     for i in sent:
         sent_mail.append(i)
     data = {
         "sent": sent_mail,
     }
     return data
-    # return render(request, 'job/drafts.html', {"drafts" : drafts})
 
 
 def draft_mails(request):
     """This will displays the drafts"""
     user = Registration.objects.get(user=request.user)
-    draft = Mails.objects.filter(sender=user, is_draft=True)
+    draft = Mails.objects.filter(sender=user, is_draft=True, is_trash=False)
     print(draft, request.user.first_name)
     return render(request, 'mail/drafts.html', {"draft": draft})
 
@@ -144,8 +143,8 @@ def receive_mails(request):
     # import pdb
     # pdb.set_trace()
     user = request.user
-    spam = Mails.objects.filter(receiver=user.email)
-    spam_mail=[]
+    spam = Mails.objects.filter(receiver=user.email, is_trash=False)
+    spam_mail = []
     inbox_mails = []
     for i in spam:
         new = User.objects.get(first_name=i.sender)
@@ -155,8 +154,8 @@ def receive_mails(request):
         else:
             inbox_mails.append(i)
         new_data = {
-            "inbox" : inbox_mails,
-            "spam" : spam_mail
+            "inbox": inbox_mails,
+            "spam": spam_mail
         }
         return new_data
 
@@ -168,3 +167,22 @@ def inbox(request):
 
 def spam_mails(request):
     return render(request, 'mail/spam.html', {"data": receive_mails(request)})
+
+
+def trash(request, id):
+    trash_mails = Mails.objects.get(id=id)
+    trash_mails.is_trash = True
+    trash_mails.save()
+    return HttpResponseRedirect("/mail/profile/")
+
+
+def show_trash(request):
+    trash_mail = Mails.objects.filter(is_trash=True)
+    return render(request, "mail/trash.html", {"trash": trash_mail})
+
+
+def resend(request, id):
+    un_draft = Mails.objects.get(id=id)
+    un_draft.is_draft = False
+    print(un_draft.is_draft)
+    return render(request, "mail/compose_mail.html", {"new": un_draft})

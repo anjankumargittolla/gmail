@@ -25,6 +25,7 @@ class Mails(models.Model):
     subject = models.CharField(max_length=100)
     body = models.TextField(max_length=500)
     is_draft = models.BooleanField(default=False)
+    is_trash = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.sender)

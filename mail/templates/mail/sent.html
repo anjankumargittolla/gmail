@@ -10,6 +10,11 @@ sender : {{i.sender}}<br>
 receiver : {{i.receiver}}<br>
 subject : {{i.subject}}<br>
 body : {{i.body}}<br>
+<form action="/mail/{{i.id}}/trash/" method="post">
+ {% csrf_token %}
+ <input type="checkbox" name="is_trash" />
+ <input type="submit" value="trash">
+</form>
 <hr>
 {% endfor %}
 <form>
